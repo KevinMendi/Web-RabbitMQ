@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  Rabbitmq: # login guest:guest
+    image: rabbitmq:3.10-management
+    hostname: "rabbitmq"
+    container_name: rabbitmq
+    labels:
+      NAME: "rabbitmq"
+    ports:
+    - "4369:4369"
+    - "5671:5671"
+    - "5672:5672"
+    - "25672:25672"
+    - "15671:15671"
+    - "15672:15672"
+    
+  RestoApi:
+    image: my_resto_api:latest
+    build:
+      context: .
+      dockerfile: RestoApi/Dockerfile
+    ports: 
+      - "5000:5000"
+    restart: on-failure
+    depends_on:
+      - "Rabbitmq"
+
+  Producer:
+    image: my_producer:latest
+    build:
+      context: .
+      dockerfile: Producer/Dockerfile
+    restart: on-failure
+    depends_on:
+      - "Rabbitmq"
+
+  Worker:
+    image: my_worker:latest
+    build:
+      context: .
+      dockerfile: Worker/Dockerfile
+    restart: on-failure
+    depends_on:
+      - "Rabbitmq"
+
+
